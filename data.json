@@ -1,0 +1,20 @@
+[
+  {
+    "id": "movie123",
+    "title": "Cyberpunk: Edgerunners - 4K Trailer",
+    "thumbnail": "https://images.unsplash.com/photo-1533488765986-dfa2a9939acd?q=80&w=1974&auto=format&fit=crop",
+    "downloads": [
+      { "quality": "480p", "size": "150MB", "url": "https://example.com/dl/480" },
+      { "quality": "720p", "size": "450MB", "url": "https://example.com/dl/720" },
+      { "quality": "1080p", "size": "1.2GB", "url": "https://example.com/dl/1080" }
+    ]
+  },
+  {
+    "id": "video99",
+    "title": "Nature Documentation: Deep Ocean",
+    "thumbnail": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop",
+    "downloads": [
+      { "quality": "HD", "size": "300MB", "url": "#" }
+    ]
+  }
+]
