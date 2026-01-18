@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="description" content="Premium Video Downloader - Fast & Secure">
+    <title>careto Download Hub</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================
+           FUTURISTIC CSS RESET
+        ============================ */
+        :root {
+            --bg-dark: #050507;
+            --bg-card: rgba(20, 20, 25, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --neon-blue: #2d5af5;
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+            --font-main: 'Space Grotesk', sans-serif;
+            --easing: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 25%, rgba(45, 90, 245, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(188, 19, 254, 0.12) 0%, transparent 45%);
+            font-family: var(--font-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Glass Card */
+        .app-container {
+            width: 100%;
+            max-width: 460px;
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            animation: floatEntry 0.8s var(--easing);
+        }
+
+        /* Ambient Glow */
+        .app-container::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-wrapper { position: relative; z-index: 2; }
+
+        /* Typography */
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 35px;
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        .author-tag {
+            display: block;
+            margin-top: 4px;
+            color: var(--neon-cyan);
+            font-weight: 500;
+            text-shadow: 0 0 12px rgba(0, 243, 255, 0.25);
+        }
+
+        /* Inputs & Buttons */
+        .input-group { position: relative; margin-bottom: 25px; }
+
+        input[type="text"] {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            padding: 16px 20px;
+            border-radius: 14px;
+            color: white;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            transition: 0.3s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.1);
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            transition: all 0.3s var(--easing);
+            box-shadow: 0 4px 25px rgba(45, 90, 245, 0.25);
+        }
+
+        .btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(188, 19, 254, 0.35);
+        }
+
+        /* Movie Details */
+        .movie-card { display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.6s var(--easing); }
+        
+        .thumbnail-container {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border);
+        }
+
+        .movie-thumb {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.6s var(--easing);
+        }
+
+        .thumbnail-container:hover .movie-thumb { transform: scale(1.05); }
+
+        .movie-title { font-size: 1.35rem; font-weight: 700; text-align: center; line-height: 1.3; }
+
+        .download-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .dl-btn {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            padding: 15px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            transition: 0.3s ease;
+        }
+
+        .dl-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.15);
+        }
+
+        .dl-quality { font-weight: 700; color: var(--neon-cyan); }
+        .dl-size { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* Footer & Icons */
+        .social-bar {
+            margin-top: 35px; display: flex; justify-content: center; gap: 20px;
+            padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .social-icon {
+            width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; background: rgba(255,255,255,0.03);
+            transition: 0.3s ease; cursor: pointer; color: white;
+        }
+
+        .social-icon:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--neon-cyan);
+            transform: translateY(-4px);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.25);
+        }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+        .loader {
+            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--neon-cyan); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 40px auto;
+        }
+        
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: rgba(10, 10, 15, 0.95); border: 1px solid var(--neon-cyan);
+            padding: 12px 28px; border-radius: 30px; font-size: 0.9rem;
+            backdrop-filter: blur(12px); opacity: 0; transition: 0.4s var(--easing); z-index: 100;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        @keyframes floatEntry { from { opacity: 0; transform: translateY(30px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="content-wrapper">
+            
+            <div id="home-view">
+                <h1>Media Downloader</h1>
+                <div class="subtitle">
+                    Fastest way to download content.<br>
+                    Created by webSheru
+                    <span class="author-tag">Dev: Narpat Parihar</span>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="movie-id-input" placeholder="Enter ID (e.g. movie123)" autocomplete="off">
+                </div>
+
+                <button class="btn-main" onclick="handleSearch()">Get Links</button>
+
+                <div class="social-bar">
+                    <a href="#" class="social-icon"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg></a>
+                    <a href="#" class="social-icon"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+                </div>
+            </div>
+
+            <div id="loader-view" class="hidden">
+                <div class="loader"></div>
+                <p style="text-align:center; font-size: 0.9rem; color: var(--text-muted)">Searching Database...</p>
+            </div>
+
+            <div id="detail-view" class="movie-card hidden">
+                <div class="thumbnail-container">
+                    <img src="" alt="Thumbnail" class="movie-thumb" id="detail-img">
+                </div>
+                
+                <h2 class="movie-title" id="detail-title">...</h2>
+
+                <div class="download-list" id="download-container">
+                    </div>
+
+                <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="dl-btn" style="justify-content: center; padding: 12px; cursor: pointer;" onclick="copyLink()">
+                        Copy Link
+                    </button>
+                    <a href="/" class="dl-btn" style="justify-content: center; padding: 12px; background: rgba(255,255,255,0.1);">
+                        Go Back
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Action Successful</div>
+
+    <script>
+        const els = {
+            home: document.getElementById('home-view'),
+            detail: document.getElementById('detail-view'),
+            loader: document.getElementById('loader-view'),
+            toast: document.getElementById('toast'),
+            input: document.getElementById('movie-id-input')
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const id = new URLSearchParams(window.location.search).get('id');
+            id ? fetchData(id) : switchView('home');
+        });
+
+        async function fetchData(id) {
+            switchView('loader');
+            try {
+                // Fetch with timestamp to prevent GitHub caching old data
+                const res = await fetch(`./data.json?t=${new Date().getTime()}`);
+                if (!res.ok) throw new Error("Network error");
+                
+                const db = await res.json();
+                const data = db.find(item => item.id === id);
+
+                setTimeout(() => {
+                    if (data) render(data);
+                    else {
+                        showToast('ID not found', true);
+                        setTimeout(() => window.location.href = window.location.pathname, 2000);
+                    }
+                }, 800); // Cinematic delay
+            } catch (e) {
+                console.error(e);
+                showToast('Database Error', true);
+                switchView('home');
+            }
+        }
+
+        function render(data) {
+            document.getElementById('detail-title').textContent = data.title;
+            document.getElementById('detail-img').src = data.thumbnail;
+            
+            const list = document.getElementById('download-container');
+            list.innerHTML = '';
+
+            data.downloads.forEach(d => {
+                const a = document.createElement('a');
+                a.className = 'dl-btn';
+                a.href = d.url;
+                a.target = '_blank'; // Opens download in new tab
+                a.innerHTML = `<span class="dl-quality">${d.quality}</span><span class="dl-size">${d.size}</span>`;
+                list.appendChild(a);
+            });
+
+            switchView('detail');
+        }
+
+        function handleSearch() {
+            const val = els.input.value.trim();
+            if (!val) return showToast('Please enter an ID');
+            
+            // SPA-like URL update
+            const newUrl = `?id=${val}`;
+            window.history.pushState({path: newUrl}, '', newUrl);
+            fetchData(val);
+        }
+
+        function switchView(view) {
+            Object.values(els).forEach(el => {
+                if(el.id.includes('view')) el.classList.add('hidden');
+            });
+            els[view].classList.remove('hidden');
+            if(view === 'detail') els.detail.style.display = 'flex';
+        }
+
+        function showToast(msg, err = false) {
+            els.toast.textContent = msg;
+            els.toast.style.borderColor = err ? '#ff4757' : 'var(--neon-cyan)';
+            els.toast.classList.add('show');
+            setTimeout(() => els.toast.classList.remove('show'), 3000);
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href);
+            showToast('Link Copied!');
+        }
+
+        els.input.addEventListener('keypress', e => e.key === 'Enter' && handleSearch());
+        window.onpopstate = () => {
+            const id = new URLSearchParams(window.location.search).get('id');
+            id ? fetchData(id) : switchView('home');
+        };
+    </script>
+</body>
+</html>
