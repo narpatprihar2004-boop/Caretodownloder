@@ -142,7 +142,7 @@
 
                 status.innerText = "Redirecting...";
                 setTimeout(() => {
-                    window.location.href = "https://www.instagram.com";
+                    window.location.href = "https://moviedownloderhub.blogspot.com";
                 }, 1000);
 
             } catch (error) {
