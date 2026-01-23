@@ -83,7 +83,7 @@
             status.innerText = "Connecting...";
 
             // URL se ?id= wala parameter uthana
-            // Note: Agar aap ?q= wale method se code chala rahe ho, to ensure karna ki URL me &id=1234 bhi ho
+            // Note: Agar aap ?q= wale method
             const msgId = GetURLParameter('id');
 
             // Fallback: Agar ID nahi mili to direct error mat do, bas log karo (testing ke liye)
